@@ -1,0 +1,13 @@
+{
+  "name": "bitcoin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node transactions.js"
+  },
+  "dependencies": {
+    "@carnesen/bitcoin-rpc": "^0.0.0",
+    "axios": "^0.19.2"
+  }
+}
