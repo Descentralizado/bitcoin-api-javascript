@@ -8,11 +8,11 @@ const axios = require('axios').default;
 
  //responsavel pela interacao com o no
 
-const rpcuser = '';
-const rpcpassword = '';
+const rpcuser = 'daniel';
+const rpcpassword = 'u9phrqQafychcG9PcZqTD0UYpX5CtjdaJLTEo2UVf0Y=';
 
-async function api(method, params = []) {
-  return await axios.post('http://159.89.53.60:18332/', { "id": "0", "method": `${method}`, "params": params }, {
+async function api(method, params = [], route = '') {
+  return await axios.post(`http://159.89.53.60:18332/${route}`, { "id": "0", "method": `${method}`, "params": params }, {
     auth: {
       username: rpcuser,
       password: rpcpassword
@@ -23,21 +23,61 @@ async function api(method, params = []) {
 async function getAccounts(accounts) {
   accounts.map(async account => {
     const { data } = await api('getaddressesbylabel', [account]);
-    console.log(data);
+    console.log('getAccounts', data);
   })
 }
 
 async function getblockcount() {
   const { data } = await api('getblockcount');
-  console.log(data);
+  console.log('getblockcount',data);
 }
 
-const accounts = ['daniel', 'pedro', 'rodrigo', 'luiz'];
+async function addNewAddressToLabel(accounts) {
+  accounts.map(async account => {
+    const { data } = await api('getnewaddress', [account]);
+    console.log('addNewAddressToLabel', data);
+  });
+}
+
+async function getAddressInfo(wallets) {
+  wallets.map(async account => {
+    const { data } = await api('getbalance', [wallets]);
+    console.log('getbalance', data);
+  });
+}
+
+async function listUnspentNode(accounts) {
+  accounts.map(async account => {
+    const { data } = await api('listunspent', [], `wallet/${account}`);
+    console.log('listunspent', data);
+  });
+}
+
+const accounts = ['pedro'];
+const wallets = ['tb1qgu5cgsfuxqc5rrk3l7ua9he7du0f9md0s4mkfs', 'tb1qyfvn249dd5x0xj0728e0uraracznpw43d39x28'];
+
 
 //conected(accounts);
 
-getblockcount();
-getAccounts(accounts);
+async function setup() {
+  // await getblockcount();
+
+  // await addNewAddressToLabel(accounts);
+  // await getAccounts(accounts);
+
+  // getAddressInfo(accounts);
+
+  await listUnspentNode(accounts);
+
+  accounts.map(async account => {
+    const { data } = await api('getbalance', [], `wallet/${account}`);
+    console.log('getbalance', data);
+  });
+}
+
+setup();
+
+
  
 //Hashing curva eliptica
 // const secp256k1 = require('secp256k1');
