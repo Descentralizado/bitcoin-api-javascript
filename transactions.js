@@ -22,7 +22,7 @@ async function api(method, params = [], route = '') {
 
 async function getAccounts(accounts) {
   accounts.map(async account => {
-    const { data } = await api('getaddressesbylabel', [account]);
+    const { data } = await api('getaddressesbylabel', ['dkdaniz'], `wallet/${account}`);
     console.log('getAccounts', data);
   })
 }
@@ -33,28 +33,24 @@ async function getblockcount() {
 }
 
 async function addNewAddressToLabel(accounts) {
-  accounts.map(async account => {
-    const { data } = await api('getnewaddress', [account]);
+  return accounts.map(async account => {
+    const { data } = await api('getnewaddress', ['joao'], `wallet/${account}`);
     console.log('addNewAddressToLabel', data);
   });
 }
 
-async function getAddressInfo(wallets) {
-  wallets.map(async account => {
-    const { data } = await api('getbalance', [wallets]);
-    console.log('getbalance', data);
-  });
+async function getBalance(otxos) {
+  return otxos.reduce((arr, otxo) => arr + otxo.amount, 0);
 }
 
-async function listUnspentNode(accounts) {
-  accounts.map(async account => {
-    const { data } = await api('listunspent', [], `wallet/${account}`);
-    console.log('listunspent', data);
-  });
+async function listUnspentNode(accounts, wallet) {
+  const { data } = await api('listunspent', [0, 999999999, [wallet]], `wallet/${accounts[0]}`);
+  const { result } = data;
+  return result;
 }
 
 const accounts = ['pedro'];
-const wallets = ['tb1qgu5cgsfuxqc5rrk3l7ua9he7du0f9md0s4mkfs', 'tb1qyfvn249dd5x0xj0728e0uraracznpw43d39x28'];
+const wallets = ['tb1q40vkqummdz7qufycvygr9wezkv2jf4yef8s5ve', 'tb1qkqzj4az73e2usd4h9a6sh435eut3ae8mrtlnle'];
 
 
 //conected(accounts);
@@ -62,17 +58,23 @@ const wallets = ['tb1qgu5cgsfuxqc5rrk3l7ua9he7du0f9md0s4mkfs', 'tb1qyfvn249dd5x0
 async function setup() {
   // await getblockcount();
 
-  // await addNewAddressToLabel(accounts);
+  // const address = await addNewAddressToLabel(accounts);
   // await getAccounts(accounts);
 
   // getAddressInfo(accounts);
 
-  await listUnspentNode(accounts);
+  const otxo = await listUnspentNode(accounts, wallets[0]);
+  const balance = await getBalance(otxo);
 
-  accounts.map(async account => {
-    const { data } = await api('getbalance', [], `wallet/${account}`);
-    console.log('getbalance', data);
-  });
+  console.log(balance);
+
+  // const privkey = await bitcoinRpc('dumpprivkey', [from]);
+  // console.log({ privkey });
+
+  // accounts.map(async account => {
+  //   const { data } = await api('getbalance', [], `wallet/${account}`);
+  //   console.log('getbalance', data);
+  // });
 }
 
 setup();
@@ -97,9 +99,6 @@ setup();
 
 // const base58check = require('bs58check');
 // const Buffers = require('buffer').Buffer;
-
-
-
 
 /*
 const ZERO = Buffer.alloc(1, 0);
