@@ -43,8 +43,8 @@ async function getBalance(otxos) {
   return otxos.reduce((arr, otxo) => arr + otxo.amount, 0);
 }
 
-async function listUnspentNode(accounts, wallet) {
-  const { data } = await api('listunspent', [0, 999999999, [wallet]], `wallet/${accounts[0]}`);
+async function listUnspentNode(accounts, wallet, confirmation=0) {
+  const { data } = await api('listunspent', [confirmation, 999999999, [wallet]], `wallet/${accounts[0]}`);
   const { result } = data;
   return result;
 }
@@ -63,10 +63,14 @@ async function setup() {
 
   // getAddressInfo(accounts);
 
-  const otxo = await listUnspentNode(accounts, wallets[0]);
-  const balance = await getBalance(otxo);
+  const otxoBalance = await listUnspentNode(accounts, wallets[0], 6);
+  const balanceFree = await getBalance(otxoBalance);
 
-  console.log(balance);
+  const otxoBalanceTotal = await listUnspentNode(accounts, wallets[0], 1);
+  const balanceTotal = await getBalance(otxoBalanceTotal);
+
+  console.log('balance que esta disponivel para uso:', balanceFree)
+  console.log('balance que esta disponivel visualizacao', balanceTotal)
 
   // const privkey = await bitcoinRpc('dumpprivkey', [from]);
   // console.log({ privkey });
